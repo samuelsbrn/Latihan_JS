@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+
+    <!-- Bootstrap v5.3 -->
+    <link
+      rel="stylesheet"
+      href="vendor/bootstrap-5.3.7/package/dist/css/bootstrap.min.css"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="vendor/bootstrap-icons-1.13.1/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div>
+        <ul class="nav nav-tabs mb-3">
+          <li class="nav-item">
+            <a class="nav-link" href="magic-number.html">Magic Number</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/password-checker.html"
+              >Password Checker</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#"
+              >Todo List</a
+            >
+          </li>
+        </ul>
+
+        <h1>Todo List</h1>
+
+        <hr />
+        <!-- Form -->
+        <form id="formData">
+          <div class="mb-3">
+            <label for="text" class="form-label">
+              Apa rencana kamu selanjutnya?
+            </label>
+            <div class="input-group flex-nowrap">
+              <input type="text" class="form-control" name="todo" placeholder="Tulis todo di sini" title="Tulis todo di sini" />
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Tambah
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <ul class="list-group" id="todoList">
+          <li class="list-group-item d-flex">
+            <div class="flex-fill">
+             <input class="form-check-input me-1" type="checkbox" value="" id="staticTodoCheckbox" title="Tandai todo selesai" />
+              <label class="form-check-label" for="staticTodoCheckbox">Ini Label</label>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-outline-danger" title="Hapus todo">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sortable.js -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <style>
+      .sortable-ghost {
+        opacity: 0.4;
+        background-color: #e9ecef;
+      }
+    </style>
+
+    <script>
+      let todos = [];
+
+      function renderTodos() {
+        const todoList = document.getElementById("todoList");
+        todoList.innerHTML = ""; // Kosongkan daftar todo
+
+        todos.forEach((item, index) => {
+          const li = document.createElement("li");
+          li.className = "list-group-item d-flex";
+
+          const div = document.createElement("div");
+          div.className = "flex-fill";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "form-check-input me-1";
+          checkbox.checked = item.completed;
+          checkbox.addEventListener("change", () => {
+            item.completed = checkbox.checked;
+            renderTodos(); // Render ulang daftar todo
+          });
+
+          const label = document.createElement("label");
+          label.className = "form-check-label";
+
+          if (item.completed) {
+            label.style.textDecoration = "line-through";
+          } else {
+            label.style.textDecoration = "none";
+          }
+          label.textContent = item.todo;
+
+          div.appendChild(checkbox);
+          div.appendChild(label);
+
+          const button = document.createElement("button");
+          button.className = "btn btn-sm btn-outline-danger";
+          button.innerHTML = '<i class="bi bi-trash"></i>';
+          button.addEventListener("click", () => {
+            todos.splice(index, 1); // Hapus todo dari array
+            renderTodos(); // Render ulang daftar todo
+          });
+
+          li.appendChild(div);
+          li.appendChild(button);
+          todoList.appendChild(li);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("formData");
+        const todoList = document.getElementById("todoList");
+
+        // Initialize Sortable
+        new Sortable(todoList, {
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          onEnd: function (evt) {
+            // Update the todos array to match the new order
+            const items = Array.from(todoList.getElementsByClassName('list-group-item'));
+            const newTodos = items.map(item => {
+              const label = item.querySelector('label');
+              const checkbox = item.querySelector('input[type="checkbox"]');
+              return {
+                todo: label.textContent,
+                completed: checkbox.checked
+              };
+            });
+            todos = newTodos;
+            localStorage.setItem("todos", JSON.stringify(todos));
+          }
+        });
+
+        // muat todos dari localStorage
+        const storedTodos = localStorage.getItem("todos");
+        if (storedTodos) {
+          todos = JSON.parse(storedTodos);
+        }
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          const todoInput = form.todo.value.trim();
+
+          if (todoInput === "") {
+            alert("Todo tidak boleh kosong!");
+            return;
+          }
+
+          // Tambahkan todo baru ke array todos pada posisi awal
+          todos.unshift({
+            todo: todoInput,
+            completed: false,
+          });
+
+          form.todo.value = ""; // Kosongkan input setelah submit
+
+          renderTodos(); // Render ulang daftar todo
+        });
+
+        renderTodos(); // Render daftar todo saat halaman dimuat
+      });
+
+      // Simpan todos ke localStorage saat halaman ditutup
+      window.addEventListener("beforeunload", () => {
+        localStorage.setItem("todos", JSON.stringify(todos));
+      });
+    </script>
+  </body>
+</html>

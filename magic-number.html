@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magic Number</title>
+
+    <link
+      rel="stylesheet"
+      href="/assets/vendor/bootstrap-5.3.7/package/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="magic-number.css" />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#"
+            >Magic Number</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/password-checker.html">Password Checker</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/index.html">Todo List</a>
+        </li>
+      </ul>
+
+      <h1>Magic Number</h1>
+      <hr />
+      <div class="alert alert-info" role="alert">
+        Ini merupakan permain sederhana dimana pemaian akan menebak angka antara
+        1 sampai 100. Jika tebakan benar permainan selesai, jika tebakan salah
+        maka akan diberitahukan apakah tebakan terlalu tinggi atau terlalu
+        rendah.
+      <div class="card d-none" id="tampilanBerhasil">
+      <div class="card" id="tampilanBerhasil">
+        <div class="card-body shadow-sm">
+          <h1 class="text-success">Selamat tebakan kamu benar!</h1>
+          <span>
+            Jumlah tebakan sebanyak <strong id="jumlahTebakan1">0</strong>
+          </span>
+        </div>
+      </div>
+      <form id="formData">
+        <div class="mb-3">
+          <label for="text" class="form-label"> Tebak Angka</label>
+          <input type="number" class="form-control" name="tebakan" placeholder="Masukkan angka 1-100" title="Tebak angka antara 1 sampai 100" />
+          <div class="invalid-feedback" id="tebakanHint"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          Kirim: <span id="jumlahTebakan2">0</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("formData");
+        const tebakanHint = document.getElementById("tebakanHint");
+        const tampilanBerhasil = document.getElementById("tampilanBerhasil");
+        const jumlahTebakan1 = document.getElementById("jumlahTebakan1");
+        const jumlahTebakan2 = document.getElementById("jumlahTebakan2");
+
+        let jumlahTebakan = 0;
+
+        // Generate a random number between 1 and 100
+        const magicNumber = Math.floor(Math.random() * 100) + 1;
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault(); // Mencegah halaman reload
+          const tebakan = parseInt(form.tebakan.value, 10);
+
+          if (isNaN(tebakan) || tebakan < 1 || tebakan > 100) {
+            tebakanHint.textContent =
+              "Tebakan harus berupa angka antara 1 dan 100.";
+            form.tebakan.classList.add("is-invalid");
+          } else {
+            if (tebakan === magicNumber) {
+              form.tebakan.classList.remove("is-invalid");
+              tebakanHint.textContent = "";
+              tampilanBerhasil.style.display = "block";
+              form.style.display = "none";
+              jumlahTebakan1.textContent = jumlahTebakan + 1;
+            } else if (tebakan < magicNumber) {
+              tebakanHint.textContent = "Tebakan Kamu terlalu rendah";
+              form.tebakan.classList.add("is-invalid");
+              jumlahTebakan++;
+              jumlahTebakan2.textContent = jumlahTebakan;
+            } else {
+              tebakanHint.textContent = "Tebakan Kamu terlalu tinggi";
+              form.tebakan.classList.add("is-invalid");
+              jumlahTebakan++;
+              jumlahTebakan2.textContent = jumlahTebakan;
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
